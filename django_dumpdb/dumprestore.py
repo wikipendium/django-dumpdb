@@ -28,7 +28,7 @@ from json import loads
 
 from django import VERSION
 from django.db import connection, transaction
-from django.db.models import get_apps, get_models
+from django.apps import apps
 from django.conf import settings
 from django.core.serializers.json import DjangoJSONEncoder
 from django.core.management import color
@@ -89,19 +89,10 @@ class CleverIterator(object):
         return iter(self).next()
 
 
-def get_models_compatibility(app):
-    """ Version of get_models compatible with < Django 1.2 """
-    if VERSION < (1, 2):
-        return get_models(app)
-    else:
-        return get_models(app, include_auto_created=True)
-
-
 def get_all_models():
-    """ Get all models, grouped by apps. """
-    for app in get_apps():
-        for model in get_models_compatibility(app):
-            yield model
+    """ Get all models. """
+    for model in apps.get_models():
+        yield model
 
 
 def server_side_cursor(connection):
